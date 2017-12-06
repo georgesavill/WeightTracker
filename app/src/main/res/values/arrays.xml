@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="reps">
+        <item>5 &#215; 5</item>
+        <item>3 &#215; 5</item>
+        <item>1 &#215; 5</item>
+        <item>3 &#215; 3</item>
+        <item>1 &#215; 3</item>
+    </string-array>
+
+</resources>

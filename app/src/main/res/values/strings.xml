@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Workout tracker</string>
+    <string name="action_settings">Settings</string>
+    <string name="no_workouts_placeholder"><b>No workouts added</b></string>
+    <string name="title_summary">Summary</string>
+    <string name="title_graphs">Progress</string>
+    <string name="title_activity_workout">Current workout</string>
+    <string name="action_addExercise">Add Exercise</string>
+    <string name="title_activity_add_exercise">Add a exercise to workout</string>
+    <string name="add_exercise_name">Exercise</string>
+    <string name="add_exercise_reps">Reps</string>
+    <string name="add_exercise_weight">Weight</string>
+    <string name="reps_5x5">5 &#215; 5</string>
+    <string name="reps_3x5">3 &#215; 5</string>
+    <string name="reps_1x5">1 &#215; 5</string>
+    <string name="reps_3x3">3 &#215; 3</string>
+    <string name="reps_1x3">1 &#215; 3</string>
+</resources>
