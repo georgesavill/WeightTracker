@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -20,6 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".WorkoutActivity"
             android:label="@string/title_activity_workout"
@@ -29,6 +31,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gpsavill.weighttracker.MainActivity" />
         </activity>
+
+
         <activity
             android:name=".AddExercise"
             android:label="@string/title_activity_add_exercise"
@@ -38,6 +42,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gpsavill.weighttracker.WorkoutActivity" />
         </activity>
+
+        <provider
+            android:name=".AppProvider"
+            android:authorities="com.gpsavill.weighttracker.provider"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

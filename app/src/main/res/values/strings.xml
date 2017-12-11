@@ -15,4 +15,5 @@
     <string name="reps_1x5">1 &#215; 5</string>
     <string name="reps_3x3">3 &#215; 3</string>
     <string name="reps_1x3">1 &#215; 3</string>
+    <string name="add_reps_dialog_title">Select reps</string>
 </resources>

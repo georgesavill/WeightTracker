@@ -1,6 +1,8 @@
 package com.gpsavill.weighttracker;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -10,16 +12,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class AddExercise extends AppCompatActivity {
     private static final String TAG = "AddExercise";
     private AlertDialog mDialog = null;
 
+    private EditText mExerciseName;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_exercise);
+
+        mExerciseName = (EditText) findViewById(R.id.add_exercise_name);
+
+        final ContentResolver contentResolver = this.getContentResolver();
+        final ContentValues values = new ContentValues();
 
         // Show cross instead of back arrow in toolbar
         final Drawable cross = getResources().getDrawable(R.drawable.ic_clear_white_24dp);
@@ -35,6 +45,11 @@ public class AddExercise extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // TODO: add exercise to current workout
+                if(mExerciseName.length()>0) {
+                    Log.d(TAG, "onClick: adding new exercise");
+                    values.put(ExerciseContract.Columns.EXERCISE_NAME, mExerciseName.getText().toString());
+                    contentResolver.insert(ExerciseContract.CONTENT_URI, values);
+                }
             }
         });
 
@@ -56,7 +71,7 @@ public class AddExercise extends AppCompatActivity {
         final TextView mReps = (TextView) findViewById(R.id.add_exercise_reps);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select reps")
+        builder.setTitle(R.string.add_reps_dialog_title)
                 .setItems(R.array.reps, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         Log.d(TAG, "onClick: clicked on " + which);
@@ -86,5 +101,4 @@ public class AddExercise extends AppCompatActivity {
         mDialog.setCanceledOnTouchOutside(true);
         mDialog.show();
     }
-
 }
