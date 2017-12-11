@@ -16,4 +16,7 @@
     <string name="reps_3x3">3 &#215; 3</string>
     <string name="reps_1x3">1 &#215; 3</string>
     <string name="add_reps_dialog_title">Select reps</string>
+    <string name="add_exercise">Add Exercise</string>
+    <string name="exercise_name">Exercise name</string>
+    <string name="cancel">Cancel</string>
 </resources>

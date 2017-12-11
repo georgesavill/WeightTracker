@@ -56,7 +56,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 // Open WorkoutActivity
-                Log.d(TAG, "onClick: starts");
+                Log.d(TAG, "onClick: FAB pressed");
                 Intent intent = new Intent(view.getContext(), WorkoutActivity.class);
                 startActivity(intent);
             }

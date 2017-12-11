@@ -8,4 +8,12 @@
         <item>1 &#215; 3</item>
     </string-array>
 
+    <!--<string-array name="exercises">-->
+        <!--<item>Benchpress</item>-->
+        <!--<item>Barbel row</item>-->
+        <!--<item>Deadlift</item>-->
+        <!--<item>Overhead press</item>-->
+        <!--<item>Squat</item>-->
+    <!--</string-array>-->
+
 </resources>
