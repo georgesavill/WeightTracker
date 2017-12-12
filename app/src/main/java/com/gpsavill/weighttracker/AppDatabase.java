@@ -42,6 +42,7 @@ class AppDatabase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "INITIALISING DATA TABLES");
+
         // Create summary table
         String summarySQL;
         summarySQL = "CREATE TABLE " + SummaryContract.TABLE_NAME + " ("
@@ -49,14 +50,17 @@ class AppDatabase extends SQLiteOpenHelper {
                 + SummaryContract.Columns.SUMMARY_DATE + " INTEGER NOT NULL, "
                 + SummaryContract.Columns.SUMMARY_WORKOUT_IDS + " TEXT NOT NULL);";
         Log.d(TAG, summarySQL);
+
         // Create workouts table
         String workoutSQL;
         workoutSQL = "CREATE TABLE " + WorkoutContract.TABLE_NAME + " ("
                 + WorkoutContract.Columns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + WorkoutContract.Columns.WORKOUT_EXERCISE_IDs + " TEXT NOT NULL, "
+                + WorkoutContract.Columns.WORKOUT_EXERCISE_NAME + " TEXT NOT NULL, "
                 + WorkoutContract.Columns.WORKOUT_REPS + " TEXT NOT NULL, "
-                + WorkoutContract.Columns.WORKOUT_WEIGHT + " REAL NOT NULL);";
+                + WorkoutContract.Columns.WORKOUT_WEIGHT + " REAL NOT NULL, "
+                + WorkoutContract.Columns.WORKOUT_STATUS + " INTEGER NOT NULL);"; // 1 for complete, 0 for in-progress
         Log.d(TAG, workoutSQL);
+
         // Create exercises table
         String exerciseSQL;
         exerciseSQL = "CREATE TABLE " + ExerciseContract.TABLE_NAME + " ("

@@ -20,7 +20,8 @@ public class WorkoutContract {
         public static final String _ID = BaseColumns._ID;
         public static final String WORKOUT_REPS = "Reps";
         public static final String WORKOUT_WEIGHT = "Weight";
-        public static final String WORKOUT_EXERCISE_IDs = "Exercise_IDs";
+        public static final String WORKOUT_EXERCISE_NAME = "Exercise_Name";
+        public static final String WORKOUT_STATUS = "Workout_Status"; // 1 for complete, 0 for in-progress
 
         private Columns(){
             // private constructor to prevent accidental instantiation

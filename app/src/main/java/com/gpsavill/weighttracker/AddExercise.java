@@ -10,6 +10,8 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,10 +31,12 @@ import static com.gpsavill.weighttracker.AppProvider.CONTENT_AUTHORITY_URI;
 
 public class AddExercise extends AppCompatActivity {
     private static final String TAG = "AddExercise";
-    public List<String> exercises = new ArrayList<>();
-    public Spinner exerciseSpinner;
-    public Spinner repsSpinner;
-    public ArrayAdapter<CharSequence> exerciseAdapter = null;
+    private List<String> exercises = new ArrayList<>();
+    private ArrayAdapter<String> exerciseAdapter = null;
+
+    private Spinner exerciseSpinner;
+    private Spinner repsSpinner;
+    private EditText weight;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -47,12 +51,60 @@ public class AddExercise extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.add_exercise_toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(cross);
+
+        // Create filter for weight input EditText
+        InputFilter filter = new InputFilter() {
+            final int maxDigitsBeforeDecimalPoint = 3;
+            final int maxDigitsAfterDecimalPoint = 1;
+
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end,
+                                       Spanned dest, int dstart, int dend) {
+                StringBuilder builder = new StringBuilder(dest);
+                builder.replace(dstart, dend, source.subSequence(start, end).toString());
+
+                if (!builder.toString().matches(
+                        "(([1-9]{1})([0-9]{0," +
+                                (maxDigitsBeforeDecimalPoint - 1) +
+                                "})?)?(\\.[0-9]{0," + maxDigitsAfterDecimalPoint + "})?"
+                )) {
+                    if (source.length() == 0) {
+                        return dest.subSequence(dstart, dend);
+                    }
+                    return "";
+                }
+                return null;
+            }
+        };
+        weight = findViewById(R.id.add_exercise_weight);
+        weight.setFilters(new InputFilter[]{filter});
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
-                // TODO: add exercise to current workout
+                // Add exercise to current workout
+                if ((!exerciseSpinner.getSelectedItem().toString().isEmpty()) &&
+                    (!repsSpinner.getSelectedItem().toString().isEmpty()) &&
+                    (!weight.getText().toString().isEmpty())) {
+
+                    String mAddExerciseName = exerciseSpinner.getSelectedItem().toString();
+                    String mAddExerciseReps = repsSpinner.getSelectedItem().toString();
+                    Float mAddExerciseWeight = Float.valueOf(weight.getText().toString());
+
+                    Toast.makeText(
+                            AddExercise.this,
+                            mAddExerciseName + ", " + mAddExerciseReps + ", " + mAddExerciseWeight,
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(
+                            AddExercise.this,
+                            "EMPTY FIELD",
+                            Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -73,7 +125,7 @@ public class AddExercise extends AppCompatActivity {
 
         // Create and populate spinner for number of exercise name
         exerciseSpinner = findViewById(R.id.add_exercise_name);
-        exerciseAdapter = new ArrayAdapter(this,
+        exerciseAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, exercises);
         exerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         exerciseSpinner.setAdapter(exerciseAdapter);
@@ -87,26 +139,28 @@ public class AddExercise extends AppCompatActivity {
 
         ImageButton addExercise = findViewById(R.id.btnAddExercise);
         addExercise.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "onClick: btnAddExercise pressed");
                 // Open add exercise dialog
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(AddExercise.this);
                 View mView = getLayoutInflater().inflate(R.layout.dialog_add_exercise, null);
-                final EditText mExerciseName = mView.findViewById(R.id.add_new_exercise);
-                final TextView mAddExercise = mView.findViewById(R.id.btn_add_new_exercise);
+                final EditText mNewExerciseName = mView.findViewById(R.id.add_new_exercise);
+                final TextView mAddNewExercise = mView.findViewById(R.id.btn_add_new_exercise);
                 TextView mCancelExercise = mView.findViewById(R.id.btn_cancel_new_exercise);
 
                 mBuilder.setView(mView);
                 final AlertDialog addExerciseDialog = mBuilder.create();
                 addExerciseDialog.show();
 
-                mAddExercise.setOnClickListener(new View.OnClickListener() {
+                mAddNewExercise.setOnClickListener(new View.OnClickListener() {
+
                     @Override
                     public void onClick(View v) {
-                        if (!mExerciseName.getText().toString().isEmpty()) {
+                        if (!mNewExerciseName.getText().toString().isEmpty()) {
                             // Add exercise to database, if it isn't already present
-                            if (exercises.contains(mExerciseName.getText().toString())) {
+                            if (exercises.contains(mNewExerciseName.getText().toString())) {
                                 // If exercise already exists, prompt user
                                 Toast.makeText(
                                         AddExercise.this,
@@ -114,13 +168,13 @@ public class AddExercise extends AppCompatActivity {
                                         Toast.LENGTH_SHORT).show();
                             } else {
                                 // Otherwise, add new exercise
-                                Log.d(TAG, "adding exercise: " + mExerciseName.getText().toString());
+                                Log.d(TAG, "adding exercise: " + mNewExerciseName.getText().toString());
                                 ContentValues newExercise = new ContentValues();
-                                newExercise.put(ExerciseContract.Columns.EXERCISE_NAME, mExerciseName.getText().toString());
+                                newExercise.put(ExerciseContract.Columns.EXERCISE_NAME, mNewExerciseName.getText().toString());
                                 getContentResolver().insert(
                                         Uri.withAppendedPath(CONTENT_AUTHORITY_URI,
                                                 ExerciseContract.TABLE_NAME), newExercise); // add new exercise to database
-                                exercises.add(mExerciseName.getText().toString()); // add new exercise to array displayed in spinner
+                                exercises.add(mNewExerciseName.getText().toString()); // add new exercise to array displayed in spinner
                                 Collections.sort(exercises); // and sort exercise array
                                 exerciseAdapter.notifyDataSetChanged();
                                 addExerciseDialog.dismiss();
@@ -131,17 +185,13 @@ public class AddExercise extends AppCompatActivity {
                                     AddExercise.this,
                                     "Enter exercise name",
                                     Toast.LENGTH_SHORT).show();
-
-//                            Snackbar.make(
-//                                    findViewById(R.id.add_exercise_layout),
-//                                    "Exercise name cannot be blank",
-//                                    Snackbar.LENGTH_SHORT)
-//                                    .show();
                         }
 
                     }
                 });
+
                 mCancelExercise.setOnClickListener(new View.OnClickListener() {
+
                     @Override
                     public void onClick(View v) {
                         addExerciseDialog.dismiss();
@@ -150,60 +200,14 @@ public class AddExercise extends AppCompatActivity {
             }
         });
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(cross);
-
 
     }
-
-//    public void addExerciseRepsDialog(){
-//        Log.d(TAG, "addExerciseRepsDialog: STARTS");
-//        final TextView mReps = (TextView) findViewById(R.id.add_exercise_reps);
-//
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(R.string.add_reps_dialog_title)
-//                .setItems(R.array.reps, new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        Log.d(TAG, "onClick: clicked on " + which);
-//                        switch(which){
-//                            case 0:
-//                                mReps.setText(R.string.reps_5x5);
-//                                break;
-//                            case 1:
-//                                mReps.setText(R.string.reps_3x5);
-//                                break;
-//                            case 2:
-//                                mReps.setText(R.string.reps_1x5);
-//                                break;
-//                            case 3:
-//                                mReps.setText(R.string.reps_3x3);
-//                                break;
-//                            case 4:
-//                                mReps.setText(R.string.reps_1x3);
-//                                break;
-//                            default:
-//                                break;
-//                        }
-//
-//                    }
-//                });
-//        mDialog = builder.create();
-//        mDialog.setCanceledOnTouchOutside(true);
-//        mDialog.show();
-//    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_add_exercise, menu);
         return true;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        exerciseSpinner.setSelection(0);
     }
 
     @Override
@@ -215,15 +219,15 @@ public class AddExercise extends AppCompatActivity {
             // Open add exercise dialog
             AlertDialog.Builder mBuilder = new AlertDialog.Builder(AddExercise.this);
             View mView = getLayoutInflater().inflate(R.layout.dialog_remove_exercise, null);
-            final Spinner mExerciseName = mView.findViewById(R.id.remove_exercise_name);
+            final Spinner mRemoveExerciseName = mView.findViewById(R.id.remove_exercise_name);
             final TextView mRemoveExercise = mView.findViewById(R.id.btn_remove_exercise);
             TextView mCancelRemoveExercise = mView.findViewById(R.id.btn_cancel_remove_exercise);
 
             // Create and populate spinner for number of exercise name
-            final ArrayAdapter<CharSequence> removeExerciseAdapter = new ArrayAdapter(this,
+            final ArrayAdapter<String> removeExerciseAdapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_spinner_item, exercises);
             removeExerciseAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            mExerciseName.setAdapter(removeExerciseAdapter);
+            mRemoveExerciseName.setAdapter(removeExerciseAdapter);
 
             // Build and display dialog
             mBuilder.setView(mView);
@@ -231,17 +235,18 @@ public class AddExercise extends AppCompatActivity {
             removeExerciseDialog.show();
 
             mRemoveExercise.setOnClickListener(new View.OnClickListener() {
+
                 @Override
                 public void onClick(View v) {
                     // Remove exercise
-                    Log.d(TAG, "removing exercise: " + mExerciseName.getSelectedItem().toString() + " from " + ExerciseContract.Columns.EXERCISE_NAME);
-                    String mExerciseForRemoval = mExerciseName.getSelectedItem().toString();
+                    Log.d(TAG, "removing exercise: " + mRemoveExerciseName.getSelectedItem().toString() + " from " + ExerciseContract.Columns.EXERCISE_NAME);
+                    String mExerciseForRemoval = mRemoveExerciseName.getSelectedItem().toString();
                     getContentResolver().delete(
                             Uri.withAppendedPath(CONTENT_AUTHORITY_URI,
                                     ExerciseContract.TABLE_NAME),
-                                    ExerciseContract.Columns.EXERCISE_NAME + " = '" + mExerciseName.getSelectedItem().toString() + "' ", null); // remove exercise from database
+                            ExerciseContract.Columns.EXERCISE_NAME + " = '" + mRemoveExerciseName.getSelectedItem().toString() + "' ", null); // remove exercise from database
 
-                    exercises.remove(mExerciseName.getSelectedItem().toString()); // remove exercise from array displayed in spinner
+                    exercises.remove(mRemoveExerciseName.getSelectedItem().toString()); // remove exercise from array displayed in spinner
                     Collections.sort(exercises); // and sort new exercise array
 
                     exerciseAdapter.notifyDataSetChanged();
@@ -257,6 +262,7 @@ public class AddExercise extends AppCompatActivity {
             });
 
             mCancelRemoveExercise.setOnClickListener(new View.OnClickListener() {
+
                 @Override
                 public void onClick(View v) {
                     removeExerciseDialog.dismiss();
